@@ -8,8 +8,10 @@
 ## 🦄 Estructura
 
     └───.env
-    └───Consumer.py         # Recibir datos y graficar
     └───Producer.py         # Mandar datos
+    └───Consumer.py         # Recibir datos y graficar
+    └───ProducerOpt.py      # Mandar datos (Optimizado)
+    └───ConsumerOpt.py      # Recibir datos y graficar (Optimizado)
     └───requirements.txt    # Modulos necesarios
     └───image.png           # Imagen
 
@@ -33,7 +35,9 @@ pip install -r requirements.txt
 
 Luego con esto listo se pueden correr los archivos Consumer.py y Producer.py en dos terminales diferentes, pueden ser en dos dispositivos y en el Consumer.py se estarán recibiendo los mensajes que se manden a ese topic.
 
+Puede seguir estas mismas instrucciones con ConsumeroOpt.py y ProducerOpt.py. Estos no son compatibles con los no-optimizados.
+
 Si se desea terminar de correr un archivo se puede interruptir el proces con ```CTRL + C ```
 
-## 🐸 Imágenes 
+## 🐸 Resultado 
 <img src="image.png" style="width:500px"></img>
