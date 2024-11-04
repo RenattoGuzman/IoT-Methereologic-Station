@@ -58,7 +58,7 @@ try:
         producer.flush()
 
         # Espera entre 15 y 30 segundos
-        time.sleep(random.randint(15, 30))
+        time.sleep(15)
 
 except KeyboardInterrupt:
     print("Interrumpido por el usuario")

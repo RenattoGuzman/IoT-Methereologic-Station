@@ -19,7 +19,6 @@ kafka_config = {
     'group.id': 'telemetria_consumer'
 }
 
-# Crear el Consumer
 consumer = Consumer(kafka_config)
 
 # Suscribirse al topic
@@ -34,6 +33,35 @@ direccion_actual = "N/A"
 # Configuración de la gráfica
 plt.ion()
 fig, ax = plt.subplots(2, 1, figsize=(10, 8))
+
+# Mapa de direcciones en valores de 3 bits
+direccion_map = {
+    "N": 0b000, "NO": 0b001, "O": 0b010, "SO": 0b011,
+    "S": 0b100, "SE": 0b101, "E": 0b110, "NE": 0b111
+}
+direccion_reverse_map = {v: k for k, v in direccion_map.items()}
+
+def decode(payload):
+    """Decodifica el payload de 3 bytes a un JSON."""
+    # Convertir de bytes a entero de 24 bits
+    data_int = int.from_bytes(payload, byteorder="big")
+    
+    # Extraer cada parte usando desplazamiento de bits y máscaras
+    temperatura = (data_int >> 13) & 0x7FF  # 11 bits
+    humedad = (data_int >> 3) & 0x7F         # 7 bits
+    direccion_viento = data_int & 0x7        # 3 bits
+
+    # Convertir temperatura a su forma original (escalar hacia atrás)
+    temperatura = temperatura / 10.0
+    direccion_viento = direccion_reverse_map[direccion_viento]
+
+    return {
+        "temperatura": temperatura,
+        "humedad": humedad,
+        "direccion_viento": direccion_viento
+    }
+
+
 
 def graph_new_value(frame):
     global direccion_actual  # Accedemos a la dirección del viento actual
@@ -63,7 +91,8 @@ def consume_data():
         return
 
     # Procesar mensaje
-    data = json.loads(msg.value().decode('utf-8'))
+    data = decode(msg.value())
+    
     temperatura = data["temperatura"]
     humedad = data["humedad"]
     direccion_actual = data["direccion_viento"]
@@ -73,12 +102,11 @@ def consume_data():
     humedades.append(humedad)
     tiempos.append(len(tiempos))
 
-
 # Configurar animación para que llame a `graph_new_value`
-ani = FuncAnimation(fig, graph_new_value, frames=None, interval=2000, cache_frame_data=False)
+ani = FuncAnimation(fig, graph_new_value, frames=None, interval=3000, cache_frame_data=False)
 
 try:
-    while True:
+    while True: 
         consume_data()  # Consumiendo datos y actualizando listas
         plt.pause(0.1)  # Mantener la gráfica interactiva
 
